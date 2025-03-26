@@ -1,1 +1,15 @@
-# 프런트엔드 프로젝트 환경을 직접 설정해보고 각 도구들이 어떻게 동작하는지 이해합니다.
+# 🚀 Welcome to your new awesome project!
+
+This project has been created using **webpack-cli**, you can now run
+
+```
+npm run build
+```
+
+or
+
+```
+yarn build
+```
+
+to bundle your application

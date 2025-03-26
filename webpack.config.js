@@ -1,86 +1,51 @@
-const path              = require('path');
-const webpack           = require('webpack');
-const htmlPlugin        = require('html-webpack-plugin');
-const openBrowserPlugin = require('open-browser-webpack-plugin'); 
-const dashboardPlugin   = require('webpack-dashboard/plugin');
-const autoprefixer      = require('autoprefixer'); 
+// Generated using webpack-cli https://github.com/webpack/webpack-cli
 
-const PATHS = {
-  app: path.join(__dirname, 'src'),
-  images:path.join(__dirname,'src/assets/'),
-  build: path.join(__dirname, 'dist')
-};
+const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WorkboxWebpackPlugin = require('workbox-webpack-plugin');
 
-const options = {
-  host:'localhost',
-  port:'1234'
-};
+const isProduction = process.env.NODE_ENV == 'production';
 
-module.exports = {
-  entry: {
-    app: PATHS.app
-  },
-  output: {
-    path: PATHS.build,
-    filename: 'bundle.[hash].js'
-  },
-  devServer: {
-      historyApiFallback: true,
-      hot: true,
-      inline: true,
-      stats: 'errors-only',
-      host: options.host,
-      port: options.port 
+
+const config = {
+    entry: './src/index.js',
+    output: {
+        path: path.resolve(__dirname, 'dist'),
     },
-  module: {
-    loaders: [
-      {
-        test: /\.js$/,
-        exclude: /(node_modules|bower_components)/,
-        loader: 'babel',
-        query: {
-          cacheDirectory: true,
-          presets: ['es2015']
-        }
-      },
-      {
-        test: /\.css$/,
-        loaders: ['style', 'css', 'postcss'],
-        include:PATHS.app
-      },
-      
-      {
-        test: /\.(ico|jpg|png|gif|eot|otf|webp|svg|ttf|woff|woff2)(\?.*)?$/,        
-        loader: 'file',
-        query: {
-          name: '[path][name].[ext]'
-        }
-      },      
-    ]
-  },
-  postcss: function() {
-    return [
-      autoprefixer({
-        browsers: [
-          '>1%',
-          'last 4 versions',
-          'Firefox ESR',
-          'not ie < 9',
-        ]
-      }),
-    ];
-  },
-  plugins:[
-    new dashboardPlugin(),
-    new webpack.HotModuleReplacementPlugin({
-        multiStep: true
-    }),
-    new htmlPlugin({
-      template:path.join(PATHS.app,'index.html'),
-      inject:'body'
-    }),
-    new openBrowserPlugin({
-      url: `http://${options.host}:${options.port}`
-    })
-  ]
+    devServer: {
+        open: true,
+        host: 'localhost',
+    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            template: 'index.html',
+        }),
+
+        // Add your plugins here
+        // Learn more about plugins from https://webpack.js.org/configuration/plugins/
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.(eot|svg|ttf|woff|woff2|png|jpg|gif)$/i,
+                type: 'asset',
+            },
+
+            // Add your rules for custom modules here
+            // Learn more about loaders from https://webpack.js.org/loaders/
+        ],
+    },
+};
+
+module.exports = () => {
+    if (isProduction) {
+        config.mode = 'production';
+        
+        
+        config.plugins.push(new WorkboxWebpackPlugin.GenerateSW());
+        
+    } else {
+        config.mode = 'development';
+    }
+    return config;
 };
